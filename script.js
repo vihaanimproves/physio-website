@@ -454,6 +454,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ── Inline validation helpers ──────────────────────────────
+    // Track which fields the user has already interacted with
+    const touchedFields = new Set();
+
     function setError(inputId, msg) {
         const el = document.getElementById(inputId);
         const err = document.getElementById(inputId + '-error');
@@ -468,53 +471,71 @@ document.addEventListener('DOMContentLoaded', function() {
         if (err) err.textContent = '';
     }
 
-    function validateForm() {
-        let valid = true;
-        const name  = document.getElementById('name');
-        const age   = document.getElementById('age');
-        const gender  = document.getElementById('gender');
-        const concern = document.getElementById('concern');
-        const desc    = document.getElementById('description');
-
-        // Reset
-        ['name','age','gender','concern','description'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) { el.classList.remove('input-error','input-valid'); }
-            const err = document.getElementById(id + '-error');
-            if (err) err.textContent = '';
-        });
-
-        if (!name.value.trim()) {
-            setError('name', 'Please enter your full name.'); valid = false;
-        } else { clearError('name'); }
-
-        const ageVal = parseInt(age.value, 10);
-        if (!age.value || isNaN(ageVal) || ageVal < 1 || ageVal > 120) {
-            setError('age', 'Please enter a valid age (1–120).'); valid = false;
-        } else { clearError('age'); }
-
-        if (!gender.value) {
-            setError('gender', 'Please select a gender.'); valid = false;
-        } else { clearError('gender'); }
-
-        if (!concern.value) {
-            setError('concern', 'Please select a concern type.'); valid = false;
-        } else { clearError('concern'); }
-
-        if (desc.value.trim().length < 20) {
-            setError('description', 'Please describe your concern in at least 20 characters.'); valid = false;
-        } else { clearError('description'); }
-
-        return valid;
+    function resetField(inputId) {
+        const el  = document.getElementById(inputId);
+        const err = document.getElementById(inputId + '-error');
+        if (el)  el.classList.remove('input-error', 'input-valid');
+        if (err) err.textContent = '';
     }
 
-    // ── Real-time validation on blur ───────────────────────────
-    ['name','age','gender','concern','description'].forEach(id => {
+    // Validate a single field; returns true if valid
+    function validateField(id) {
+        if (id === 'name') {
+            const el = document.getElementById('name');
+            if (!el.value.trim()) { setError('name', 'Please enter your full name.'); return false; }
+            clearError('name'); return true;
+        }
+        if (id === 'email') {
+            const el = document.getElementById('email');
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!el.value.trim() || !re.test(el.value.trim())) { setError('email', 'Please enter a valid email address.'); return false; }
+            clearError('email'); return true;
+        }
+        if (id === 'age') {
+            const el = document.getElementById('age');
+            const v  = parseInt(el.value, 10);
+            if (!el.value || isNaN(v) || v < 1 || v > 120) { setError('age', 'Please enter a valid age (1–120).'); return false; }
+            clearError('age'); return true;
+        }
+        if (id === 'gender') {
+            const el = document.getElementById('gender');
+            if (!el.value) { setError('gender', 'Please select a gender.'); return false; }
+            clearError('gender'); return true;
+        }
+        if (id === 'concern') {
+            const el = document.getElementById('concern');
+            if (!el.value) { setError('concern', 'Please select a concern type.'); return false; }
+            clearError('concern'); return true;
+        }
+        if (id === 'description') {
+            const el = document.getElementById('description');
+            if (el.value.trim().length < 20) { setError('description', 'Please describe your concern in at least 20 characters.'); return false; }
+            clearError('description'); return true;
+        }
+        return true;
+    }
+
+    // Full-form validation (used on submit – touches all fields)
+    function validateForm() {
+        const ids = ['name','email','age','gender','concern','description'];
+        ids.forEach(id => touchedFields.add(id)); // mark all as touched on submit
+        return ids.map(id => validateField(id)).every(Boolean);
+    }
+
+    // ── Per-field blur: only validate fields the user has left ──
+    ['name','email','age','gender','concern','description'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
         el.addEventListener('blur', () => {
-            // Trigger mini-validate for this field only
-            validateForm(); // re-run all; errors only show for touched fields
+            touchedFields.add(id);
+            validateField(id);
+        });
+        // Also re-validate on change/input once touched
+        el.addEventListener('input', () => {
+            if (touchedFields.has(id)) validateField(id);
+        });
+        el.addEventListener('change', () => {
+            if (touchedFields.has(id)) validateField(id);
         });
     });
 
@@ -581,4 +602,34 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.key === 'Escape' && modal.classList.contains('modal-open')) closeModal();
     });
 
+})();
+
+
+// ========================================
+// PHONE / WHATSAPP MODAL (index.html)
+// ========================================
+(function () {
+    const trigger = document.getElementById('phoneModalTrigger');
+    const modal   = document.getElementById('phoneModal');
+    const closeBtn= document.getElementById('phoneModalClose');
+    if (!trigger || !modal) return;
+
+    function openPhoneModal(e) {
+        e.preventDefault();
+        modal.classList.add('modal-open');
+        document.body.style.overflow = 'hidden';
+    }
+    function closePhoneModal() {
+        modal.classList.remove('modal-open');
+        document.body.style.overflow = '';
+    }
+
+    trigger.addEventListener('click', openPhoneModal);
+    if (closeBtn) closeBtn.addEventListener('click', closePhoneModal);
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) closePhoneModal();
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.classList.contains('modal-open')) closePhoneModal();
+    });
 })();

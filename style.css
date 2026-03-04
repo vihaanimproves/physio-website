@@ -4471,3 +4471,132 @@ img {
     60%      { transform: translateX(-4px); }
     80%      { transform: translateX(4px); }
 }
+
+.optional {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--text-light);
+    margin-left: 4px;
+}
+
+/* ========================================
+   PHONE / WHATSAPP CHOICE MODAL
+   ======================================== */
+
+.phone-modal-trigger {
+    color: var(--primary-color);
+    font-weight: 500;
+    font-size: 16px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.phone-modal-trigger:hover {
+    color: var(--primary-dark);
+}
+
+.phone-modal-trigger::after {
+    content: '▾';
+    font-size: 12px;
+    opacity: 0.6;
+}
+
+/* Re-use .modal-overlay and .modal-box from contact form,
+   only add phone-specific overrides */
+.phone-choice-modal {
+    max-width: 440px;
+    padding: 48px 44px 52px;
+    position: relative;
+    text-align: center;
+}
+
+.modal-close-x {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    background: var(--bg-light);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-gray);
+    transition: var(--transition);
+}
+
+.modal-close-x:hover {
+    background: var(--border-color);
+    color: var(--text-dark);
+}
+
+.phone-choice-modal h3 {
+    font-size: 22px;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+}
+
+.phone-modal-subtitle {
+    font-size: 15px;
+    color: var(--text-gray);
+    margin-bottom: 32px;
+}
+
+.phone-modal-choices {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+.phone-choice-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 36px 32px;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: var(--transition);
+    background: white;
+    border: 2px solid var(--border-color);
+    flex: 1;
+    max-width: 170px;
+    box-shadow: var(--shadow-sm);
+}
+
+.phone-choice-btn:hover {
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-4px);
+}
+
+.phone-choice-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+}
+
+.phone-choice-icon svg {
+    width: 60px;
+    height: 60px;
+}
+
+.phone-choice-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--primary-color);
+    letter-spacing: 0.2px;
+}
+
+/* Both buttons share the same theme — no colour overrides needed */
+.whatsapp-choice,
+.call-choice {
+    /* inherits from .phone-choice-btn */
+}
