@@ -1,5 +1,6 @@
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
+    document.body.classList.add('page-fade-in'); // Ensure page visible immediately
     
     // ========================================
     // MOBILE NAVIGATION TOGGLE
